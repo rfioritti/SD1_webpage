@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riesgos de recorrido SafeDrive</title>
+    <style>
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* Fondo semitransparente */
+            z-index: 9999; /* Asegúrate de que esté por encima de otros elementos */
+            display: none; /* Inicialmente oculto */
+        }
+
+        #loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #3498db;
+            width: 50px;
+            height: 50px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            color: #4285f4;
+            border-bottom: 2px solid #4285f4;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
+            text-align: center;
+        }
+
+        #controls, #map{
+            background-color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #form {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 50px;
+        }
+
+        .main-background {
+            display: flex;
+            flex-direction: row;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .column {
+            flex: 50%;
+            height: 700px;
+        }
+
+        #legend-title {
+            font-weight: bold;
+        }
+
+        .legend-list {
+            margin-top: 5px;
+        }
+
+        .icon-reference {
+            vertical-align: middle;
+        }
+        .icon {
+            vertical-align: middle;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4285f4;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #loading-indicator {
+            margin: 5px;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        @media (max-width: 800px) {
+
+            #controls {
+                height: 400px;
+            }
+
+            .main-background {
+                display: block;
+            }
+        }
+
+        #response-message {
+            background-color: #dff0d8;
+            color: #3c763d;
+            padding: 0px;
+            border: 0px solid #d6e9c6;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        #response-message.safe {
+            background-color: #dff0d8;
+            color: #3c763d;
+            font-weight: bold;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        #response-message.medium {
+            background-color: #f0eed8;
+            color: #d8d037;
+            font-weight: bold;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        #response-message.danger {
+            background-color: #f0d8d8;
+            color: #c02421;
+            font-weight: bold;
+            border: 1px solid #d6e9c6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        #response-message.error {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div id="loading-spinner"></div>
+    </div>
+
+    <h1>Riesgo de recorrido</h1>
+    <div id="response-message"></div>
+
+    <div class="main-background">
+        <div class="column" id="controls">
+            
+            <div id="form">
+                <div>
+                    <label for="origin">Origen:</label>
+                    <input type="text" id="origin" placeholder="Ingresa la ubicación de origen">
+
+                    <label for="destination">Destino:</label>
+                    <input type="text" id="destination" placeholder="Ingresa la ubicación de destino">
+                </div>
+                <div><button onclick="calculateRoute()">Calcular Ruta</button></div>
+
+            </div>
+
+            <div id="legend">
+                <div id="legend-title">Referencias</div>
+                <div class="legend-list">
+                    <img src="https://maps.gstatic.com/mapfiles/ms2/micons/mechanic.png" class="icon">
+                    <span class="icon-reference">Mayor concentracion de accidentes</span>
+                </div>
+                <div class="legend-list">
+                    <img src="https://maps.gstatic.com/mapfiles/ms2/micons/caution.png" class="icon">
+                    <span class="icon-reference">Accidentes graves</span>
+                </div>
+            
+            </div>
+            
+        </div>
+        <div class="column" id="map"></div>
+    </div>
+
+    <script>
+        var map;
+        var directionsService;
+        var directionsRenderer;
+        var originAutocomplete;
+        var destinationAutocomplete;
+        var markers = [];
+        var markersDictionary = {};
+        var markersArray = [];
+        var markersJSON;
+
+        function sendMarkersData() {
+            var xhr = new XMLHttpRequest();
+            var url = 'http://52.14.15.57:5555/receive_markers';  // Actualizar con IP actual del EC2 de servicios
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            var responseMessageElement = document.getElementById('response-message');
+            var loadingOverlay = document.getElementById('loading-overlay');
+            
+            responseMessageElement.innerHTML = '';
+            responseMessageElement.className = '';
+            loadingOverlay.style.display = 'block';
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    
+                    loadingOverlay.style.display = 'none';
+
+                    var jsonResponse = {};
+
+                    try {
+                        jsonResponse = JSON.parse(xhr.responseText);
+                    } catch (error) {
+                        console.error('Error al analizar la respuesta JSON del servidor:', error);
+                    }
+
+                    if (xhr.status == 200) {
+                        
+                        if (jsonResponse.results[0] <= 5){
+                            responseMessageElement.className = 'safe';
+                        } else if (jsonResponse.results[0] > 5 && jsonResponse.results[0] <= 8) {
+                            responseMessageElement.className = 'medium';
+                        } else {
+                            responseMessageElement.className = 'danger';
+                        }
+
+                        responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del recorrido es: ' + Math.round(jsonResponse.results[0] * 100) / 100;
+
+                        var risk = jsonResponse.results[0];
+                        var accidentMarks = jsonResponse.results[1];
+                        var dangerMarks = jsonResponse.results[2];
+
+                        console.log(risk);
+                        console.log(accidentMarks);
+                        console.log(dangerMarks);
+
+                        clearMarkers();
+
+                        for (var i = 0; i < accidentMarks.length; i++) {
+                            var coordinate = accidentMarks[i].coordenada;
+                            var position = new google.maps.LatLng(coordinate.latitud, coordinate.longitud);
+                            var accidents = accidentMarks[i].accidentes;
+                            if (accidents > 0) {
+                                addMarkerYellow(position);
+                            }
+                        }
+
+                        for (var i = 0; i < dangerMarks.length; i++) {
+                            var coordinate = dangerMarks[i];
+                            var position = new google.maps.LatLng(coordinate.latitud, coordinate.longitud);
+                            addMarkerOrange(position);
+                        }
+
+                    } else {
+                        responseMessageElement.className = 'error';
+                        responseMessageElement.innerHTML = 'Error del servidor: ' + jsonResponse.message;
+                    }
+                }
+            };
+
+            xhr.send(markersJSON);
+        }
+
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -32.522779, lng: -55.765835},  // Uruguay
+                zoom: 7
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                draggable: true,
+                map: map
+            });
+
+            originAutocomplete = new google.maps.places.Autocomplete(document.getElementById('origin'), {
+                componentRestrictions: {country: 'uy'}
+            });
+
+            destinationAutocomplete = new google.maps.places.Autocomplete(document.getElementById('destination'), {
+                componentRestrictions: {country: 'uy'}
+            });
+        }
+
+        function calculateRoute() {
+            clearMarkers(); 
+
+            var origin = document.getElementById('origin').value;
+            var destination = document.getElementById('destination').value;
+
+            var originPlace = originAutocomplete.getPlace();
+            var destinationPlace = destinationAutocomplete.getPlace();
+
+            var originPosition = { latitud: originPlace.geometry.location.lat(), longitud: originPlace.geometry.location.lng() };
+
+            if (!originPlace || !originPlace.place_id || !destinationPlace || !destinationPlace.place_id) {
+                window.alert('Por favor, selecciona ubicaciones válidas.');
+                return;
+            }
+
+            directionsService.route({
+                origin: {placeId: originPlace.place_id},
+                destination: {placeId: destinationPlace.place_id},
+                travelMode: 'DRIVING'
+            }, function(response, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(response);
+
+                    // Crear marcadores cada 50m de viaje
+                    var route = response.routes[0];
+                    for (var i = 0; i < route.legs.length; i++) {
+                        var steps = route.legs[i].steps;
+                        for (var j = 0; j < steps.length; j++) {
+                            var path = steps[j].path;
+                            var distance = 0;
+
+                            for (var k = 0; k < path.length - 1; k++) {
+                                distance += google.maps.geometry.spherical.computeDistanceBetween(path[k], path[k + 1]);
+
+                                while (distance >= 50) {
+                                    var fraction = (50 - (distance - google.maps.geometry.spherical.computeDistanceBetween(path[k], path[k + 1]))) / google.maps.geometry.spherical.computeDistanceBetween(path[k], path[k + 1]);
+                                    var position = google.maps.geometry.spherical.interpolate(path[k], path[k + 1], fraction);
+
+                                    // Mostrar coordenadas en la consola y guardar marcador en array
+                                    console.log('Marcador en la Ruta:', position.lat(), position.lng());
+                                    markersArray.push({ latitud: position.lat(), longitud: position.lng() });
+
+                                    distance -= 50;
+                                }
+                            }
+                        }
+                    }
+                    // Ordenar el array de marcadores segun la distancia al origen
+                    markersArray.sort(function(a, b) {
+                        var distanceToOriginA = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(a.latitud, a.longitud), new google.maps.LatLng(originPosition.latitud, originPosition.longitud));
+                        var distanceToOriginB = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(b.latitud, b.longitud), new google.maps.LatLng(originPosition.latitud, originPosition.longitud));
+
+                        return distanceToOriginA - distanceToOriginB;
+                    });
+
+                    // Filtrar el array para incluir solo el siguiente marcador mas cercano
+                    markersArray = markersArray.filter(function(marker) {
+                        return marker !== originPosition;
+                    });
+                    
+                    // Convertir array en diccionario
+                    markersArray.forEach(function(marker, index) {
+                        markersDictionary[index.toString()] = marker;
+                    });
+
+                    // Mostrar el diccionario de marcadores en la consola
+                    console.log('Marcadores en formato de Diccionario:', markersDictionary);
+
+                    // Convertir a JSON y enviar los datos de marcadores ordenados
+                    markersJSON = JSON.stringify(markersDictionary);
+                    console.log('Marcadores en formato JSON:', markersJSON);
+                    sendMarkersData();
+
+                    markersDictionary = {};
+                    markersArray = [];
+
+
+                } else {
+                    window.alert('No se pudo calcular la ruta: ' + status);
+                }
+            });
+        }
+
+
+        function addMarkerBlue(location) {
+            
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                title: 'Marcador en la Ruta'
+            });
+            markers.push(marker);
+        }
+
+        function addMarkerYellow(location) {
+            
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/mechanic.png',
+                title: 'Marcador en la Ruta'
+            });
+            markers.push(marker);
+        }
+
+        function addMarkerOrange(location) {
+            
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/caution.png',
+                title: 'Marcador en la Ruta'
+            });
+            markers.push(marker);
+        }
+
+        function clearMarkers() {
+            
+            for (var i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
+            markers = [];
+        }
+    </script>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXkkEYKiuM2dbrpg0ZCVFCr5qAhKI89bk&callback=initMap&libraries=places,drawing,geometry">
+    </script>
+
+</body>
+</html>
