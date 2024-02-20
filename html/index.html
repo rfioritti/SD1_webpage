@@ -629,6 +629,14 @@
     </script>
 
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+    <script>
+        // Redirecciona automáticamente al usuario a la página de inicio de sesión
+        window.onload = function() {
+            window.location.href = 'https://www.gstatic.com/firebasejs/8.0/firebase.js';
+        };
+    </script>
+    
     <script>
         function onSignIn(googleUser) {
             // Aquí puedes obtener información del usuario si es necesario
