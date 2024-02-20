@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com">
     <title>Riesgos de recorrido SafeDrive</title>
     <style>
         
@@ -197,6 +198,8 @@
         <div id="loading-spinner"></div>
     </div>
 
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
     <h1>Riesgo de recorrido</h1>
     <div id="response-message"></div>
 
@@ -243,9 +246,9 @@
         var markersArray = [];
         var markersJSON;
 
-        function sendMarkersData() {
+        function sendMarkersDataRoute() {
             var xhr = new XMLHttpRequest();
-            var url = 'http://52.14.15.57:5555/receive_markers';  // Actualizar con IP actual del EC2 de servicios
+            var url = 'http://3.133.81.219:5555/receive_markers';  // Actualizar con IP actual del EC2 de servicios
 
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -317,6 +320,79 @@
             xhr.send(markersJSON);
         }
 
+        function sendMarkersDataArea() {
+            var xhr = new XMLHttpRequest();
+            var url = 'http://52.14.15.57:5555/receive_area';  // Actualizar con IP actual del EC2 de servicios
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            var responseMessageElement = document.getElementById('response-message');
+            var loadingOverlay = document.getElementById('loading-overlay');
+            
+            responseMessageElement.innerHTML = '';
+            responseMessageElement.className = '';
+            loadingOverlay.style.display = 'block';
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    
+                    loadingOverlay.style.display = 'none';
+
+                    var jsonResponse = {};
+
+                    try {
+                        jsonResponse = JSON.parse(xhr.responseText);
+                    } catch (error) {
+                        console.error('Error al analizar la respuesta JSON del servidor:', error);
+                    }
+
+                    if (xhr.status == 200) {
+                        
+                        if (jsonResponse.results[0] <= 5){
+                            responseMessageElement.className = 'safe';
+                        } else if (jsonResponse.results[0] > 5 && jsonResponse.results[0] <= 8) {
+                            responseMessageElement.className = 'medium';
+                        } else {
+                            responseMessageElement.className = 'danger';
+                        }
+
+                        responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del recorrido es: ' + Math.round(jsonResponse.results[0] * 100) / 100;
+
+                        var risk = jsonResponse.results[0];
+                        var accidentMarks = jsonResponse.results[1];
+                        var dangerMarks = jsonResponse.results[2];
+
+                        console.log(risk);
+                        console.log(accidentMarks);
+                        console.log(dangerMarks);
+
+                        clearMarkers();
+
+                        for (var i = 0; i < accidentMarks.length; i++) {
+                            var coordinate = accidentMarks[i].coordenada;
+                            var position = new google.maps.LatLng(coordinate.latitud, coordinate.longitud);
+                            var accidents = accidentMarks[i].accidentes;
+                            if (accidents > 0) {
+                                addMarkerYellow(position);
+                            }
+                        }
+
+                        for (var i = 0; i < dangerMarks.length; i++) {
+                            var coordinate = dangerMarks[i];
+                            var position = new google.maps.LatLng(coordinate.latitud, coordinate.longitud);
+                            addMarkerOrange(position);
+                        }
+
+                    } else {
+                        responseMessageElement.className = 'error';
+                        responseMessageElement.innerHTML = 'Error del servidor: ' + jsonResponse.message;
+                    }
+                }
+            };
+
+            xhr.send(markersJSON);
+        }        
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -411,7 +487,7 @@
                     // Convertir a JSON y enviar los datos de marcadores ordenados
                     markersJSON = JSON.stringify(markersDictionary);
                     console.log('Marcadores en formato JSON:', markersJSON);
-                    sendMarkersData();
+                    sendMarkersDataRoute();
 
                     markersDictionary = {};
                     markersArray = [];
@@ -422,6 +498,90 @@
                 }
             });
         }
+
+        function calculateArea(){
+            clearMarkers(); 
+
+            var origin = document.getElementById('origin').value;
+            var destination = document.getElementById('destination').value;
+
+            var originPlace = originAutocomplete.getPlace();
+            var destinationPlace = destinationAutocomplete.getPlace();
+
+            var originPosition = { latitud: originPlace.geometry.location.lat(), longitud: originPlace.geometry.location.lng() };
+
+            if (!originPlace || !originPlace.place_id || !destinationPlace || !destinationPlace.place_id) {
+                window.alert('Por favor, selecciona ubicaciones válidas.');
+                return;
+            }
+
+            directionsService.route({
+                origin: {placeId: originPlace.place_id},
+                destination: {placeId: destinationPlace.place_id},
+                travelMode: 'DRIVING'
+            }, function(response, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(response);
+
+                    // Crear marcadores cada 200m de viaje (Simulacion de 40 km/h, 1 marcador cada 20s)
+                    var route = response.routes[0];
+                    for (var i = 0; i < route.legs.length; i++) {
+                        var steps = route.legs[i].steps;
+                        for (var j = 0; j < steps.length; j++) {
+                            var path = steps[j].path;
+                            var distance = 0;
+
+                            for (var k = 0; k < path.length - 1; k++) {
+                                distance += google.maps.geometry.spherical.computeDistanceBetween(path[k], path[k + 1]);
+
+                                while (distance >= 200) {
+                                    var fraction = (200 - (distance - google.maps.geometry.spherical.computeDistanceBetween(path[k], path[k + 1]))) / google.maps.geometry.spherical.computeDistanceBetween(path[k], path[k + 1]);
+                                    var position = google.maps.geometry.spherical.interpolate(path[k], path[k + 1], fraction);
+
+                                    // Mostrar coordenadas en la consola y guardar marcador en array
+                                    console.log('Marcador en la Ruta:', position.lat(), position.lng());
+                                    markersArray.push({ latitud: position.lat(), longitud: position.lng() });
+
+                                    distance -= 200;
+                                }
+                            }
+                        }
+                    }
+                    // Ordenar el array de marcadores segun la distancia al origen
+                    markersArray.sort(function(a, b) {
+                        var distanceToOriginA = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(a.latitud, a.longitud), new google.maps.LatLng(originPosition.latitud, originPosition.longitud));
+                        var distanceToOriginB = google.maps.geometry.spherical.computeDistanceBetween(new google.maps.LatLng(b.latitud, b.longitud), new google.maps.LatLng(originPosition.latitud, originPosition.longitud));
+
+                        return distanceToOriginA - distanceToOriginB;
+                    });
+
+                    // Filtrar el array para incluir solo el siguiente marcador mas cercano
+                    markersArray = markersArray.filter(function(marker) {
+                        return marker !== originPosition;
+                    });
+                    
+                    // Convertir array en diccionario
+                    markersArray.forEach(function(marker, index) {
+                        markersDictionary[index.toString()] = marker;
+                    });
+
+                    // Mostrar el diccionario de marcadores en la consola
+                    console.log('Marcadores en formato de Diccionario:', markersDictionary);
+
+                    // Convertir a JSON y enviar los datos de marcadores ordenados
+                    markersJSON = JSON.stringify(markersDictionary);
+                    console.log('Marcadores en formato JSON:', markersJSON);
+                    sendMarkersDataArea();
+
+                    markersDictionary = {};
+                    markersArray = [];
+
+
+                } else {
+                    window.alert('No se pudo calcular la ruta: ' + status);
+                }
+            });
+        };
 
 
         function addMarkerBlue(location) {
@@ -468,6 +628,21 @@
 
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXkkEYKiuM2dbrpg0ZCVFCr5qAhKI89bk&callback=initMap&libraries=places,drawing,geometry">
+    </script>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        function onSignIn(googleUser) {
+            // Aquí puedes obtener información del usuario si es necesario
+            var profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // No se incluye por razones de seguridad
+            console.log('Nombre: ' + profile.getName());
+            console.log('Imagen URL: ' + profile.getImageUrl());
+            console.log('Email: ' + profile.getEmail());
+
+            // Redirige al usuario después del inicio de sesión
+            window.location.href = 'http://safedrive2.uy';
+        }
     </script>
 
 </body>
