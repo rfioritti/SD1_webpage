@@ -630,11 +630,13 @@
 
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     
+    <script src="https://www.gstatic.com/firebasejs/8.0/firebase.js"></script>
     <script>
-        // Redirecciona automáticamente al usuario a la página de inicio de sesión
-        window.onload = function() {
-            window.location.href = 'https://www.gstatic.com/firebasejs/8.0/firebase.js';
-        };
+      var config = {
+        apiKey: "AIzaSyDXkkEYKiuM2dbrpg0ZCVFCr5qAhKI89bk",
+        authDomain: "optimistic-host-406619.firebaseapp.com",
+      };
+      firebase.initializeApp(config);
     </script>
     
     <script>
