@@ -194,6 +194,11 @@
 </head>
 <body>
 
+    <div id="loginPopup" style="display: none;">
+        <h2>Iniciar sesión con Google</h2>
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
+
     <div id="loading-overlay">
         <div id="loading-spinner"></div>
     </div>
@@ -628,14 +633,12 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXkkEYKiuM2dbrpg0ZCVFCr5qAhKI89bk&callback=initMap&libraries=places,drawing,geometry">
     </script>
 
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script>
-        // Redirecciona automáticamente al usuario a la página de inicio de sesión
-        window.onload = function() {
-            window.location.href = 'https://www.gstatic.com/firebasejs/8.0/firebase.js';
-        };
-    </script>
-    <script>
+        // Función para abrir la ventana emergente automáticamente
+        function openLoginPopup() {
+            document.getElementById('loginPopup').style.display = 'block';
+        }
+        
         function onSignIn(googleUser) {
             // Aquí puedes obtener información del usuario si es necesario
             var profile = googleUser.getBasicProfile();
@@ -647,7 +650,11 @@
             // Redirige al usuario después del inicio de sesión
             window.location.href = 'http://safedrive2.uy';
         }
+        window.onload = openLoginPopup;
     </script>
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
 
 </body>
 </html>
