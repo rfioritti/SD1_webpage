@@ -47,7 +47,7 @@
     <h1>SafeDrive 2 - Inicie sesión con Google</h1>
 
     <!-- Botón de inicio de sesión con Google -->
-    <button id="googleSignInButton" class="g-signin2" onclick="onSignIn">Iniciar sesión con Google</button>
+    <button id="googleSignInButton" class="g-signin2" data-onsuccess="onSignIn">Iniciar sesión con Google</button>
 </div>
 
 <!-- Incluir el script de la API de Google Sign-In -->
@@ -55,7 +55,7 @@
 
 <script>
     // Función para manejar el inicio de sesión con Google
-    function onSignIn() {
+    function onSignIn(googleUser) {
         // Redirigir al usuario a la página principal después del inicio de sesión exitoso
         window.location.href = 'map.html';
     }
