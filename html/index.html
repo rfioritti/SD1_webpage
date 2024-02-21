@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google-signin-client_id" content="801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com">
     <title>Riesgos de recorrido SafeDrive</title>
     <style>
         
@@ -193,10 +192,6 @@
     </style>
 </head>
 <body>
-    <div id="loginPopup">
-        <h2>Iniciar sesión con Google</h2>
-        <div class="g-signin2" data-onsuccess="onSignIn"></div>
-    </div>
 
     <div id="loading-overlay">
         <div id="loading-spinner"></div>
@@ -237,38 +232,8 @@
         <div class="column" id="map"></div>
     </div>
 
-
-
-
-    
-    <script>
-        // Función para redirigir después del inicio de sesión con Google
-        function redirectToMainPage() {
-            window.location.href = 'http://safedrive2.uy'; // Cambia la URL según tu necesidad
-        }
-
-        // Esta función se llamará cuando se inicie sesión con Google
-        function onSignIn(googleUser) {
-            // Aquí puedes agregar el código para lo que quieras hacer después del inicio de sesión
-            // Por ejemplo, redireccionar a otra página:
-            redirectToMainPage();
-        }
-
-        // Llama a la función para abrir la ventana emergente al cargar la página
-        function openLoginPopup() {
-            document.getElementById('loginPopup').style.display = 'block';
-        }
-        
-        // Llama a openLoginPopup al cargar la página
-        window.onload = openLoginPopup;
-    </script>
-
-    <!-- Carga la biblioteca de Google Sign-In -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-
-
-
-
+    <!-- Enlace a la página de inicio de sesión -->
+    <a href="login.html">Iniciar sesión con Google</a>
 
     <script>
         var map;
