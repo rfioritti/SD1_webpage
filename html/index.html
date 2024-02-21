@@ -233,7 +233,12 @@
     </div>
     <h1>Bienvenido a SafeDrive</h1>
     <!-- Enlace a la página de inicio de sesión -->
-    <a href="login.html">Iniciar sesión con Google</a>
+    <script>
+        // Redirige automáticamente a la página de inicio de sesión después de que la página se haya cargado
+        window.onload = function() {
+            window.location.href = "login.html";
+        };
+    </script>
     <script>
         var map;
         var directionsService;
