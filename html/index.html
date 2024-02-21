@@ -193,8 +193,7 @@
     </style>
 </head>
 <body>
-
-    <div id="loginPopup" style="display: none;">
+    <div id="loginPopup">
         <h2>Iniciar sesión con Google</h2>
         <div class="g-signin2" data-onsuccess="onSignIn"></div>
     </div>
@@ -238,6 +237,39 @@
         <div class="column" id="map"></div>
     </div>
 
+
+
+
+    
+    <script>
+        // Función para redirigir después del inicio de sesión con Google
+        function redirectToMainPage() {
+            window.location.href = 'http://safedrive2.uy'; // Cambia la URL según tu necesidad
+        }
+
+        // Esta función se llamará cuando se inicie sesión con Google
+        function onSignIn(googleUser) {
+            // Aquí puedes agregar el código para lo que quieras hacer después del inicio de sesión
+            // Por ejemplo, redireccionar a otra página:
+            redirectToMainPage();
+        }
+
+        // Llama a la función para abrir la ventana emergente al cargar la página
+        function openLoginPopup() {
+            document.getElementById('loginPopup').style.display = 'block';
+        }
+        
+        // Llama a openLoginPopup al cargar la página
+        window.onload = openLoginPopup;
+    </script>
+
+    <!-- Carga la biblioteca de Google Sign-In -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+
+
+
+
     <script>
         var map;
         var directionsService;
@@ -251,7 +283,7 @@
 
         function sendMarkersDataRoute() {
             var xhr = new XMLHttpRequest();
-            var url = 'http://3.133.81.219:5555/receive_markers';  // Actualizar con IP actual del EC2 de servicios
+            var url = 'http://3.22.141.139:5555/receive_markers';  // Actualizar con IP actual del EC2 de servicios
 
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -325,7 +357,7 @@
 
         function sendMarkersDataArea() {
             var xhr = new XMLHttpRequest();
-            var url = 'http://52.14.15.57:5555/receive_area';  // Actualizar con IP actual del EC2 de servicios
+            var url = 'http://3.22.141.139:5555/receive_area';  // Actualizar con IP actual del EC2 de servicios
 
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -632,29 +664,6 @@
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXkkEYKiuM2dbrpg0ZCVFCr5qAhKI89bk&callback=initMap&libraries=places,drawing,geometry">
     </script>
-
-    <script>
-        // Función para abrir la ventana emergente automáticamente
-        function openLoginPopup() {
-            document.getElementById('loginPopup').style.display = 'block';
-        }
-        
-        function onSignIn(googleUser) {
-            // Aquí puedes obtener información del usuario si es necesario
-            var profile = googleUser.getBasicProfile();
-            console.log('ID: ' + profile.getId()); // No se incluye por razones de seguridad
-            console.log('Nombre: ' + profile.getName());
-            console.log('Imagen URL: ' + profile.getImageUrl());
-            console.log('Email: ' + profile.getEmail());
-
-            // Redirige al usuario después del inicio de sesión
-            window.location.href = 'http://safedrive2.uy';
-        }
-        window.onload = openLoginPopup;
-    </script>
-
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-
 
 </body>
 </html>
