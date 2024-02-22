@@ -67,66 +67,50 @@
 </script> 
 -->
 <script src="https://apis.google.com/js/platform.js?onload=gapi.load('auth2','v2')"></script>
-  
 <script>
-async function loginWithGoogle() {
-    try {
-        // Carga las credenciales de Google
-        const credentials = JSON.parse(fs.readFileSync('credentials.json'));
-
-        // Crea una instancia de GoogleAuth
-        const auth = new google.auth.GoogleAuth({
-            credentials,
-            scopes: ['profile', 'email'],
-        });
-
-        // Inicia el flujo de autorización
-        const { code } = await auth.signIn();
-
-        // Obtén el token de acceso
-        const { tokens } = await auth.getToken(code);
-
-        // Guarda el token de acceso
-        localStorage.setItem('accessToken', tokens.access_token);
-
-        // Redirige al usuario
-        window.location.href = 'other.html';
-    } catch (error) {
-        console.error('Error al iniciar sesión con Google:', error);
-        // Aquí puedes agregar código para manejar el error, como mostrar un mensaje al usuario
-    }
-}
-
-function onSignIn(googleUser) {
-    try {
-        // Obtiene el token de acceso
-        const accessToken = googleUser.getAuthResponse().access_token;
-
-        // Guarda el token de acceso
-        localStorage.setItem('accessToken', accessToken);
-
-        // Redirige al usuario
-        window.location.href = 'map.html';
-    } catch (error) {
-        console.error('Error al obtener token de acceso:', error);
-        // Aquí puedes agregar código para manejar el error, como mostrar un mensaje al usuario
-    }
-}
-
-gapi.load('auth2', function() {
-    gapi.auth2.init({
-        client_id: '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com',
-    });
-
-    const googleLoginButton = document.getElementById('google-login-button');
-    googleLoginButton.addEventListener('click', function() {
-        gapi.auth2.getAuthInstance().signIn().then(null, function(error) {
+    async function loginWithGoogle() {
+        try {
+            // Obtiene el cliente ID de Google
+            const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
+    
+            // Crea una instancia de GoogleAuth
+            const auth = new google.auth2.GoogleAuth({
+                client_id: clientId,
+                scope: 'profile email'
+            });
+    
+            // Inicia el flujo de autorización
+            const googleUser = await auth.signIn();
+    
+            // Obtiene el token de acceso
+            const accessToken = googleUser.getAuthResponse().access_token;
+    
+            // Guarda el token de acceso en el almacenamiento local
+            localStorage.setItem('accessToken', accessToken);
+    
+            // Redirige al usuario
+            window.location.href = 'map.html';
+        } catch (error) {
             console.error('Error al iniciar sesión con Google:', error);
             // Aquí puedes agregar código para manejar el error, como mostrar un mensaje al usuario
+        }
+    }
+    
+    gapi.load('auth2', function() {
+        const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
+    
+        gapi.auth2.init({
+            client_id: clientId
+        });
+    
+        const googleLoginButton = document.getElementById('google-login-button');
+        googleLoginButton.addEventListener('click', function() {
+            loginWithGoogle();
         });
     });
-});
- 
- </script>
+    </script>
+    
+    
+    
 </body>
 </html>
