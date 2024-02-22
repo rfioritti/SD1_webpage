@@ -41,7 +41,7 @@
 </head>
 <body>
     <h1>Inicio de sesión con Google</h1>
-    <button id="google-login-button" onclick="loginWithGoogle()">Iniciar sesión con Google</button>
+    <button id="google-login-button">Iniciar sesión con Google</button>
 
     <script src="https://apis.google.com/js/platform.js?onload=onGoogleScriptLoad"></script>
     <script>
@@ -77,12 +77,16 @@
 
             // Inicializa la API de Google Auth con el cliente ID
             gapi.load('auth2', function() {
-                authInstance = gapi.auth2.init({
+                gapi.auth2.init({
                     client_id: clientId
+                }).then((instance) => {
+                    authInstance = instance;
+                    // Habilita el botón de inicio de sesión después de que la API de Google Auth se haya inicializado
+                    document.getElementById('google-login-button').addEventListener('click', loginWithGoogle);
+                }).catch((error) => {
+                    console.error('Error al inicializar la API de Google Auth:', error);
                 });
             });
-
-            console.log('La función onGoogleScriptLoad se ha ejecutado correctamente.');
         }
     </script>
 </body>
