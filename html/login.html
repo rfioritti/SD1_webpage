@@ -44,15 +44,18 @@
     </style>
 </head>
 <body>
-
-<div class="divLogin">
+    <h1>Inicio de sesión con Google</h1>
+    <button id="google-login-button">Iniciar sesión con Google</button>
+    <script src="https://apis.google.com/js/platform.js?onload=gapi.load('auth2','v2')"></script>
+    <script src="index.js"></script>
+<!--
+ <div class="divLogin">
     <h1>SafeDrive 2 - Inicie sesión con Google</h1>
 
-    <!-- Botón de inicio de sesión con Google -->
+    
     <button id="googleSignInButton" class="g-signin2" data-onsuccess="onSignIn">Iniciar sesión con Google</button>
 </div>
 
-<!-- Incluir el script de la API de Google Sign-In -->
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 
 <script>
@@ -61,7 +64,58 @@
         // Redirigir al usuario a la página principal después del inicio de sesión exitoso
         window.location.href = 'map.html';
     }
-</script>
+</script> 
+-->
+<script>async function loginWithGoogle() {
+    // Carga las credenciales de Google
+    const credentials = JSON.parse(fs.readFileSync('credentials.json'));
+  
+    // Crea una instancia de GoogleAuth
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['profile', 'email'],
+    });
+  
+    // Inicia el flujo de autorización
+    try {
+      const { code } = await auth.signIn();
+  
+      // Obtén el token de acceso
+      const { tokens } = await auth.getToken(code);
+  
+      // Guarda el token de acceso
+      localStorage.setItem('accessToken', tokens.access_token);
+  
+      // Redirige al usuario
+      window.location.href = 'other.html';
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
+ 
+ 
+    function onSignIn(googleUser) {
+      // Obtiene el token de acceso
+      const accessToken = googleUser.getAuthResponse().access_token;
+
+      // Guarda el token de acceso
+      localStorage.setItem('accessToken', accessToken);
+
+      // Redirige al usuario
+      window.location.href = 'map.html';
+    }
+
+    gapi.load('auth2', function() {
+      gapi.auth2.init({
+        client_id: 'YOUR_CLIENT_ID',
+      });
+
+      const googleLoginButton = document.getElementById('google-login-button');
+      googleLoginButton.addEventListener('click', function() {
+        gapi.auth2.getAuthInstance().signIn();
+      });
+    });
+ </script>
 </body>
 </html>
