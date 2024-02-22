@@ -67,36 +67,22 @@
 </script> 
 -->
 <script src="https://apis.google.com/js/platform.js?onload=gapi.load('auth2','v2')"></script>
+<script src="https://apis.google.com/js/platform.js?onload=onGoogleScriptLoad"></script>
 <script>
-    function onGoogleScriptLoad() {
-        const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
-    
-        // Carga la API de Google Auth
-        gapi.load('auth2', function() {
-            // Inicializa la API de Google Auth con el cliente ID
-            gapi.auth2.init({
-                client_id: clientId
-            });
-        });
-    }
-    
     async function loginWithGoogle() {
         try {
-            // Espera a que la API de Google Auth se haya cargado completamente
-            await gapi.auth2.getAuthInstance();
-    
-            // Crea una instancia de GoogleAuth
+            // Obtiene la instancia de GoogleAuth
             const auth = gapi.auth2.getAuthInstance();
-    
+
             // Inicia el flujo de autorización
             const googleUser = await auth.signIn();
-    
+
             // Obtiene el token de acceso
             const accessToken = googleUser.getAuthResponse().access_token;
-    
+
             // Guarda el token de acceso en el almacenamiento local
             localStorage.setItem('accessToken', accessToken);
-    
+
             // Redirige al usuario
             window.location.href = 'map.html';
         } catch (error) {
@@ -104,15 +90,16 @@
             // Aquí puedes agregar código para manejar el error, como mostrar un mensaje al usuario
         }
     }
-    
-    // Llama a la función loginWithGoogle cuando la API de Google se haya cargado
-    gapi.load('client:auth2', loginWithGoogle);
-    
-    </script>
-    
-    <!-- Agrega el atributo onload para llamar a onGoogleScriptLoad cuando el script de Google se haya cargado -->
-    <script src="https://apis.google.com/js/platform.js?onload=onGoogleScriptLoad" async defer></script>
-    
+
+    function onGoogleScriptLoad() {
+        const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
+
+        // Inicializa la API de Google Auth con el cliente ID
+        gapi.auth2.init({
+            client_id: clientId
+        });
+    }
+</script>
     
     
 </body>
