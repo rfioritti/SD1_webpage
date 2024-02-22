@@ -82,7 +82,8 @@
                 }).then((instance) => {
                     authInstance = instance;
                     // Habilita el botón de inicio de sesión después de que la API de Google Auth se haya inicializado
-                    document.getElementById('google-login-button').addEventListener('click', loginWithGoogle);
+                    const googleLoginButton = document.getElementById('google-login-button');
+                    googleLoginButton.addEventListener('click', loginWithGoogle);
                 }).catch((error) => {
                     console.error('Error al inicializar la API de Google Auth:', error);
                 });
