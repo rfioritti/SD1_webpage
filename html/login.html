@@ -69,8 +69,13 @@
 <script src="https://apis.google.com/js/platform.js?onload=gapi.load('auth2','v2')"></script>
 <script src="https://apis.google.com/js/platform.js?onload=onGoogleScriptLoad"></script>
 <script>
+    let authInstance;
+
     async function loginWithGoogle() {
         try {
+            // Espera a que la instancia de autenticación esté disponible
+            await authInstance;
+
             // Obtiene la instancia de GoogleAuth
             const auth = gapi.auth2.getAuthInstance();
 
@@ -95,11 +100,12 @@
         const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
 
         // Inicializa la API de Google Auth con el cliente ID
-        gapi.auth2.init({
+        authInstance = gapi.auth2.init({
             client_id: clientId
         });
     }
 </script>
+
     
     
 </body>
