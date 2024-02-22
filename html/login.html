@@ -69,6 +69,32 @@
 <script src="https://apis.google.com/js/platform.js?onload=gapi.load('auth2','v2')"></script>
   
 <script>
+async function loginWithGoogle() {
+    // Carga las credenciales de Google
+    const credentials = JSON.parse(fs.readFileSync('credentials.json'));
+  
+    // Crea una instancia de GoogleAuth
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['profile', 'email'],
+    });
+  
+    // Inicia el flujo de autorización
+    try {
+      const { code } = await auth.signIn();
+  
+      // Obtén el token de acceso
+      const { tokens } = await auth.getToken(code);
+  
+      // Guarda el token de acceso
+      localStorage.setItem('accessToken', tokens.access_token);
+  
+      // Redirige al usuario
+      window.location.href = 'map.html';
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
  
  
@@ -93,6 +119,7 @@
         gapi.auth2.getAuthInstance().signIn();
       });
     });
+ 
  </script>
 </body>
 </html>
