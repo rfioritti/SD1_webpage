@@ -45,7 +45,7 @@
 </head>
 <body>
     <h1>Inicio de sesión con Google</h1>
-    <button id="google-login-button">Iniciar sesión con Google</button>
+    <button id="google-login-button" onclick="loginWithGoogle()">Iniciar sesión con Google</button>
     <script src="https://apis.google.com/js/platform.js?onload=gapi.load('auth2','v2')"></script>
     <script src="index.js"></script>
 <!--
@@ -68,16 +68,25 @@
 -->
 <script src="https://apis.google.com/js/platform.js?onload=gapi.load('auth2','v2')"></script>
 <script>
+    function onGoogleScriptLoad() {
+        const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
+    
+        // Carga la API de Google Auth
+        gapi.load('auth2', function() {
+            // Inicializa la API de Google Auth con el cliente ID
+            gapi.auth2.init({
+                client_id: clientId
+            });
+        });
+    }
+    
     async function loginWithGoogle() {
         try {
-            // Obtiene el cliente ID de Google
-            const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
+            // Espera a que la API de Google Auth se haya cargado completamente
+            await gapi.auth2.getAuthInstance();
     
             // Crea una instancia de GoogleAuth
-            const auth = new google.auth2.GoogleAuth({
-                client_id: clientId,
-                scope: 'profile email'
-            });
+            const auth = gapi.auth2.getAuthInstance();
     
             // Inicia el flujo de autorización
             const googleUser = await auth.signIn();
@@ -96,19 +105,13 @@
         }
     }
     
-    gapi.load('auth2', function() {
-        const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
+    // Llama a la función loginWithGoogle cuando la API de Google se haya cargado
+    gapi.load('client:auth2', loginWithGoogle);
     
-        gapi.auth2.init({
-            client_id: clientId
-        });
-    
-        const googleLoginButton = document.getElementById('google-login-button');
-        googleLoginButton.addEventListener('click', function() {
-            loginWithGoogle();
-        });
-    });
     </script>
+    
+    <!-- Agrega el atributo onload para llamar a onGoogleScriptLoad cuando el script de Google se haya cargado -->
+    <script src="https://apis.google.com/js/platform.js?onload=onGoogleScriptLoad" async defer></script>
     
     
     
