@@ -100,12 +100,13 @@
         const clientId = '801008312625-6aqnk9faljsf3fojrc2teppc2k11cvkq.apps.googleusercontent.com';
 
         // Inicializa la API de Google Auth con el cliente ID
-        authInstance = gapi.auth2.init({
-            client_id: clientId
+        gapi.load('auth2', function() {
+            authInstance = gapi.auth2.init({
+                client_id: clientId
+            });
         });
     }
 </script>
-
     
     
 </body>
