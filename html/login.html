@@ -46,13 +46,12 @@
     </style>
 </head>
 <body>
- <div class="divLogin">
-    <h1>SafeDrive 2 - Inicie sesión con Google</h1>
-    <button id="googleSignInButton" class="g-signin2" data-onsuccess="onSignIn">Iniciar sesión con Google</button>
-</div>
-
-<script src="https://apis.google.com/js/platform.js" async defer></script>
-
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload"
+         data-client_id="424447066083-p0vihf78g8kuc9mri4gp9jklqpp2lduu.apps.googleusercontent.com"
+         data-callback="onSignIn">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
 <script>
     // Función para manejar el inicio de sesión con Google
     function onSignIn(googleUser) {
