@@ -192,7 +192,14 @@
     </style>
 </head>
 <body>
-
+    <h1>Bienvenido a SafeDrive</h1>
+    <!-- Enlace a la página de inicio de sesión -->
+    <script>
+        // Redirige automáticamente a la página de inicio de sesión después de que la página se haya cargado
+        window.onload = function() {
+            window.location.href = "login.html";
+        };
+    </script>
     <div id="loading-overlay">
         <div id="loading-spinner"></div>
     </div>
@@ -231,14 +238,6 @@
         </div>
         <div class="column" id="map"></div>
     </div>
-    <h1>Bienvenido a SafeDrive</h1>
-    <!-- Enlace a la página de inicio de sesión -->
-    <script>
-        // Redirige automáticamente a la página de inicio de sesión después de que la página se haya cargado
-        window.onload = function() {
-            window.location.href = "login.html";
-        };
-    </script>
     <script>
         var map;
         var directionsService;
@@ -631,7 +630,9 @@
     </script>
 
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDXkkEYKiuM2dbrpg0ZCVFCr5qAhKI89bk&callback=initMap&libraries=places,drawing,geometry">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6udgMQVyv3QXnW4U833I8VfzV8Ryx7Lg&callback=initMap&libraries=places,drawing,geometry">
+</script>
+    </script>
     </script>
 </body>
 
