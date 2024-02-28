@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--<meta name="google-signin-client_id" content="424447066083-voavopo8962q6n2sg5okrlg7dcnmas1h.apps.googleusercontent.com">-->
-    
     <title>Iniciar sesión - SafeDrive</title>
     <style>
         body {
@@ -16,19 +14,19 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            flex-direction: column; /* Para colocar los elementos uno debajo del otro */
+            flex-direction: column;
         }
 
         .divLogin {
             text-align: center;
-            margin-bottom: 20px; /* Espacio entre el texto y el botón */
+            margin-bottom: 20px;
         }
 
         h1 {
             color: #4285f4;
         }
 
-        #googleSignInButton {
+        .g_id_signin {
             width: 200px;
             height: 40px;
             background-color: #4285f4;
@@ -37,22 +35,27 @@
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
         }
 
-        #googleSignInButton:hover {
+        .g_id_signin:hover {
             background-color: #357ae8;
         }
     </style>
 </head>
 <body>
- <div class="divLogin">
+<div class="divLogin">
     <h1>SafeDrive 2 - Inicie sesión con Google</h1>
 </div>
+
 <div id="g_id_onload"
      data-client_id="424447066083-voavopo8962q6n2sg5okrlg7dcnmas1h.apps.googleusercontent.com"
      data-context="signin"
      data-ux_mode="redirect"
-     data-login_uri="safedrive2.uy/map.html"
+     data-login_uri="http://safedrive2.uy/map.html"
      data-auto_prompt="false">
 </div>
 
@@ -64,7 +67,9 @@
      data-size="large"
      data-locale="es-419"
      data-logo_alignment="left">
+    Iniciar sesión con Google
 </div>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>
