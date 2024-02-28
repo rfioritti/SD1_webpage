@@ -48,21 +48,23 @@
  <div class="divLogin">
     <h1>SafeDrive 2 - Inicie sesión con Google</h1>
 </div>
+<div id="g_id_onload"
+     data-client_id="424447066083-voavopo8962q6n2sg5okrlg7dcnmas1h.apps.googleusercontent.com"
+     data-context="signin"
+     data-ux_mode="redirect"
+     data-login_uri="safedrive2.uy/map.html"
+     data-auto_prompt="false">
+</div>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-    <div id="g_id_onload"
-         data-client_id="424447066083-voavopo8962q6n2sg5okrlg7dcnmas1h.apps.googleusercontent.com"
-         data-callback="handleCredentialResponse">
-    </div>
-    <div class="g_id_signin" data-type="standard"></div>
-
-<script>
-    // Función para manejar el inicio de sesión con Google
-    function handleCredentialResponse(googleUser) {
-        // Redirigir al usuario a la página principal después del inicio de sesión exitoso
-        window.location.href = 'map.html';
-    }
-</script> 
+<div class="g_id_signin"
+     data-type="standard"
+     data-shape="pill"
+     data-theme="filled_blue"
+     data-text="signin_with"
+     data-size="large"
+     data-locale="es-419"
+     data-logo_alignment="left">
+</div>
 
 </body>
 </html>
