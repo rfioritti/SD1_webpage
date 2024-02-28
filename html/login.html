@@ -1,47 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login con Google</title>
-    <!-- Incluye la biblioteca de Google Sign-In -->
-    <script src="https://accounts.google.com/gsi/client"></script>
-    <!-- Define la función onSignIn para manejar la autenticación exitosa -->
-    <script>
-        function onSignIn(response) {
-            var profile = response.getBasicProfile();
-            var id_token = response.getAuthResponse().id_token;
-            var name = profile.getName();
-            var email = profile.getEmail();
-            
-            // Aquí puedes hacer lo que necesites con los datos del usuario, como enviarlos a un backend para registrarlos en una base de datos
-            
-            console.log('ID: ' + profile.getId()); // No se recomienda enviar el ID al cliente
-            console.log('Nombre: ' + name);
-            console.log('Email: ' + email);
-            console.log('ID Token: ' + id_token);
-            
-            // Redireccionar al usuario a la página principal
-            window.location.href = "map.html";
+    <!--<meta name="google-signin-client_id" content="424447066083-voavopo8962q6n2sg5okrlg7dcnmas1h.apps.googleusercontent.com">-->
+    
+    <title>Iniciar sesión - SafeDrive</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column; /* Para colocar los elementos uno debajo del otro */
         }
-    </script>
+
+        .divLogin {
+            text-align: center;
+            margin-bottom: 20px; /* Espacio entre el texto y el botón */
+        }
+
+        h1 {
+            color: #4285f4;
+        }
+
+        #googleSignInButton {
+            width: 200px;
+            height: 40px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #googleSignInButton:hover {
+            background-color: #357ae8;
+        }
+    </style>
 </head>
 <body>
-    <!-- Añade el botón de login con Google -->
+ <div class="divLogin">
+    <h1>SafeDrive 2 - Inicie sesión con Google</h1>
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
     <div id="g_id_onload"
          data-client_id="424447066083-voavopo8962q6n2sg5okrlg7dcnmas1h.apps.googleusercontent.com"
-         data-auto_prompt="false">
+         data-callback="handleCredentialResponse">
     </div>
-    <div class="g_id_signin"
-         data-type="standard"
-         data-size="large"
-         data-theme="outline"
-         data-text="signin_with"
-         data-shape="rectangular"
-         data-logo_alignment="left"
-         data-redirect_uri="http://safedrive2.uy/map.html"
-         data-use_hint="false"
-         data-onsuccess="onSignIn">
-    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+<script>
+    // Función para manejar el inicio de sesión con Google
+    function handleCredentialResponse(googleUser) {
+        // Redirigir al usuario a la página principal después del inicio de sesión exitoso
+        window.location.href = 'map.html';
+    }
+</script> 
+
 </body>
 </html>
