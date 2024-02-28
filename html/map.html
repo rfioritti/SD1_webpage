@@ -21,9 +21,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.7); /* Fondo semitransparente */
-            z-index: 9999; /* Asegúrate de que esté por encima de otros elementos */
-            display: none; /* Inicialmente oculto */
+            background-color: rgba(255, 255, 255, 0.7); 
+            z-index: 9999; 
+            display: none; 
         }
 
         #loading-spinner {
@@ -74,6 +74,14 @@
             display: flex;
             flex-direction: column;
             margin-bottom: 50px;
+        }
+
+        .button-container {
+            display: flex;
+        }
+
+        .button-container div {
+            margin-right: 5px;
         }
 
         .main-background {
@@ -211,8 +219,10 @@
                     <label for="destination">Destino:</label>
                     <input type="text" id="destination" placeholder="Ingresa la ubicación de destino">
                 </div>
-                <div><button onclick="calculateRoute()">Calcular Ruta</button></div>
-
+                <div class="button-container">
+                    <div><button onclick="calculateRoute()">Calcular Ruta</button></div>
+                    <div><button onclick="calculateArea()">Calcular Riesgo Cercano</button></div>
+                </div>
             </div>
 
             <div id="legend">
@@ -238,9 +248,11 @@
         var directionsRenderer;
         var originAutocomplete;
         var destinationAutocomplete;
+
         var markers = [];
         var markersDictionary = {};
         var markersArray = [];
+        var deptArray = [];
         var markersJSON;
 
         function sendMarkersDataRoute() {
@@ -315,101 +327,6 @@
             };
 
             xhr.send(markersJSON);
-        }
-
-        function sendMarkersDataArea() {
-            var xhr = new XMLHttpRequest();
-            var url = 'http://3.22.141.139:5555/receive_area';  // Actualizar con IP actual del EC2 de servicios
-
-            xhr.open('POST', url, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-
-            var responseMessageElement = document.getElementById('response-message');
-            var loadingOverlay = document.getElementById('loading-overlay');
-            
-            responseMessageElement.innerHTML = '';
-            responseMessageElement.className = '';
-            loadingOverlay.style.display = 'block';
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4) {
-                    
-                    loadingOverlay.style.display = 'none';
-
-                    var jsonResponse = {};
-
-                    try {
-                        jsonResponse = JSON.parse(xhr.responseText);
-                    } catch (error) {
-                        console.error('Error al analizar la respuesta JSON del servidor:', error);
-                    }
-
-                    if (xhr.status == 200) {
-                        
-                        if (jsonResponse.results[0] <= 5){
-                            responseMessageElement.className = 'safe';
-                        } else if (jsonResponse.results[0] > 5 && jsonResponse.results[0] <= 8) {
-                            responseMessageElement.className = 'medium';
-                        } else {
-                            responseMessageElement.className = 'danger';
-                        }
-
-                        responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del recorrido es: ' + Math.round(jsonResponse.results[0] * 100) / 100;
-
-                        var risk = jsonResponse.results[0];
-                        var accidentMarks = jsonResponse.results[1];
-                        var dangerMarks = jsonResponse.results[2];
-
-                        console.log(risk);
-                        console.log(accidentMarks);
-                        console.log(dangerMarks);
-
-                        clearMarkers();
-
-                        for (var i = 0; i < accidentMarks.length; i++) {
-                            var coordinate = accidentMarks[i].coordenada;
-                            var position = new google.maps.LatLng(coordinate.latitud, coordinate.longitud);
-                            var accidents = accidentMarks[i].accidentes;
-                            if (accidents > 0) {
-                                addMarkerYellow(position);
-                            }
-                        }
-
-                        for (var i = 0; i < dangerMarks.length; i++) {
-                            var coordinate = dangerMarks[i];
-                            var position = new google.maps.LatLng(coordinate.latitud, coordinate.longitud);
-                            addMarkerOrange(position);
-                        }
-
-                    } else {
-                        responseMessageElement.className = 'error';
-                        responseMessageElement.innerHTML = 'Error del servidor: ' + jsonResponse.message;
-                    }
-                }
-            };
-
-            xhr.send(markersJSON);
-        }        
-
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -32.522779, lng: -55.765835},  // Uruguay
-                zoom: 7
-            });
-
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({
-                draggable: true,
-                map: map
-            });
-
-            originAutocomplete = new google.maps.places.Autocomplete(document.getElementById('origin'), {
-                componentRestrictions: {country: 'uy'}
-            });
-
-            destinationAutocomplete = new google.maps.places.Autocomplete(document.getElementById('destination'), {
-                componentRestrictions: {country: 'uy'}
-            });
         }
 
         function calculateRoute() {
@@ -496,8 +413,65 @@
             });
         }
 
-        function calculateArea(){
-            clearMarkers(); 
+        async function sendMarkersDataArea() {
+            
+            return new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+                var url = 'http://3.22.141.139:5555/receive_area';  // Actualizar con IP actual del EC2 de servicios
+
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                var responseMessageElement = document.getElementById('response-message');
+
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {
+                        
+
+                        var jsonResponse = {};
+
+                        try {
+                            jsonResponse = JSON.parse(xhr.responseText);
+                        } catch (error) {
+                            console.error('Error al analizar la respuesta JSON del servidor:', error);
+                        }
+
+                        if (xhr.status == 200) {
+                            
+                            if (jsonResponse.results[0] <= 5){
+                                responseMessageElement.className = 'safe';
+                            } else if (jsonResponse.results[0] > 5 && jsonResponse.results[0] <= 8) {
+                                responseMessageElement.className = 'medium';
+                            } else {
+                                responseMessageElement.className = 'danger';
+                            }
+
+                            responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del área es: ' + jsonResponse.results[0];
+
+                            var risk = jsonResponse.results[0];
+                            deptArray = jsonResponse.results[1];
+
+                            console.log(risk);
+
+                            clearMarkers();
+                            resolve();
+
+                        } else {
+                            responseMessageElement.className = 'error';
+                            responseMessageElement.innerHTML = 'Error del servidor: ' + jsonResponse.message;
+                            reject();
+                        }
+                    }
+                };
+
+                xhr.send(markersJSON);
+
+            });
+        }
+        
+        async function calculateArea(){
+            clearMarkers();
 
             var origin = document.getElementById('origin').value;
             var destination = document.getElementById('destination').value;
@@ -516,7 +490,7 @@
                 origin: {placeId: originPlace.place_id},
                 destination: {placeId: destinationPlace.place_id},
                 travelMode: 'DRIVING'
-            }, function(response, status) {
+            }, async function(response, status) {
                 if (status === 'OK') {
                     directionsRenderer.setDirections(response);
 
@@ -562,16 +536,34 @@
                         markersDictionary[index.toString()] = marker;
                     });
 
+                    console.log(markersArray);
+
                     // Mostrar el diccionario de marcadores en la consola
                     console.log('Marcadores en formato de Diccionario:', markersDictionary);
 
-                    // Convertir a JSON y enviar los datos de marcadores ordenados
-                    markersJSON = JSON.stringify(markersDictionary);
-                    console.log('Marcadores en formato JSON:', markersJSON);
-                    sendMarkersDataArea();
+                    for (const dato of markersArray) {
+                        
+                        //Diccionario del marcador a enviar
+                        var areaMarker = {};
+                        areaMarker['mark'] = dato;
+                        
+                        //Agregar la lista de Deptos al diccionario antes pasar a JSON
+                        areaMarker['deptos'] = deptArray;
+
+                        // Convertir a JSON y enviar los datos de marcadores ordenados
+                        markersJSON = JSON.stringify(areaMarker);
+                        console.log('Marcador de AREA en formato JSON:', areaMarker);                        
+                        
+                        await sendMarkersDataArea();
+
+                        var position = new google.maps.LatLng(dato['latitud'], dato['longitud']);
+                        addMarkerBlue(position)
+                        
+                    };
 
                     markersDictionary = {};
                     markersArray = [];
+                    deptArray = [];
 
 
                 } else {
@@ -580,6 +572,26 @@
             });
         };
 
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -32.522779, lng: -55.765835},  // Uruguay
+                zoom: 7
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                draggable: true,
+                map: map
+            });
+
+            originAutocomplete = new google.maps.places.Autocomplete(document.getElementById('origin'), {
+                componentRestrictions: {country: 'uy'}
+            });
+
+            destinationAutocomplete = new google.maps.places.Autocomplete(document.getElementById('destination'), {
+                componentRestrictions: {country: 'uy'}
+            });
+        }
 
         function addMarkerBlue(location) {
             
@@ -626,6 +638,6 @@
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6udgMQVyv3QXnW4U833I8VfzV8Ryx7Lg&callback=initMap&libraries=places,drawing,geometry">
     </script>
-</body>
 
+</body>
 </html>
