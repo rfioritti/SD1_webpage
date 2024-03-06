@@ -69,7 +69,7 @@
             const email = document.getElementById('emailInput').value;
             // Llamada a tu backend para enviar el código por correo electrónico
             // Puedes usar fetch para hacer una solicitud HTTP al servidor.
-            fetch('/sendCode', {
+            fetch('http://3.22.141.139:5557/sendCode', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,14 +87,15 @@
 
         function verifyCode() {
             const code = document.getElementById('verificationCodeInput').value;
+            const email = document.getElementById('emailInput').value;
             // Llamada a tu backend para verificar el código de verificación
             // Puedes usar fetch para hacer una solicitud HTTP al servidor.
-            fetch('/verifyCode', {
+            fetch('http://3.22.141.139:5557/verifyCode', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ code: code }),
+                body: JSON.stringify({ email: email, code: code }),
             })
             .then(response => {
                 if (response.ok) {
