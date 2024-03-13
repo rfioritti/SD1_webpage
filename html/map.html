@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riesgos de recorrido SafeDrive</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         
         body {
@@ -101,6 +102,11 @@
 
         .legend-list {
             margin-top: 5px;
+        }
+
+        #disclaimer {
+            position: absolute;
+            bottom: 0;
         }
 
         .icon-reference {
@@ -259,7 +265,7 @@
                 <div id="legend-title">Referencias</div>
                 <div class="legend-list">
                     <img src="https://maps.gstatic.com/mapfiles/ms2/micons/mechanic.png" class="icon">
-                    <span class="icon-reference">Mayor concentracion de siniestros</span>
+                    <span class="icon-reference">Mayores concentraciones de siniestros y su valor</span>
                 </div>
                 <div class="legend-list">
                     <img src="https://maps.gstatic.com/mapfiles/ms2/micons/caution.png" class="icon">
@@ -276,6 +282,9 @@
                     <span class="icon-reference danger">Alto</span>
                 </div>
             
+            </div>
+            <div id="disclaimer">
+                Datos extraídos de UNASEV sobre siniestros ocurridos entre 1/1/2020 y 30/6/2023
             </div>
             
         </div>
@@ -349,7 +358,7 @@
                             var position = new google.maps.LatLng(coordinate.latitud, coordinate.longitud);
                             var accidents = accidentMarks[i].accidentes;
                             if (accidents > 0) {
-                                addMarkerYellow(position);
+                                addMarkerYellow(position, accidents);
                             }
                         }
 
@@ -644,14 +653,21 @@
             markers.push(marker);
         }
 
-        function addMarkerYellow(location) {
-            
+        function addMarkerYellow(location, number) {
             var marker = new google.maps.Marker({
                 position: location,
                 map: map,
-                icon: 'https://maps.gstatic.com/mapfiles/ms2/micons/mechanic.png',
-                title: 'Marcador en la Ruta'
+                icon: {
+                    url: 'https://maps.gstatic.com/mapfiles/ms2/micons/mechanic.png',
+                    scaledSize: new google.maps.Size(40, 40), // Tamaño del icono
+                },
+                label: {text: number.toString(),
+                    color: "black",
+                    fontWeight: "bold",
+                    fontSize: "20px"
+                },
             });
+
             markers.push(marker);
         }
 

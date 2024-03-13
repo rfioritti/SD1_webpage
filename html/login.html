@@ -99,6 +99,7 @@
             })
             .then(response => {
                 if (response.ok) {
+                    window.location.href = "map.html";
                     alert('Código de verificación válido. Login exitoso!');
                 } else {
                     alert('Código de verificación inválido. Inténtalo de nuevo.');
