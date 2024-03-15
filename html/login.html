@@ -88,8 +88,7 @@
         function verifyCode() {
             const code = document.getElementById('verificationCodeInput').value;
             const email = document.getElementById('emailInput').value;
-            // Llamada a tu backend para verificar el código de verificación
-            // Puedes usar fetch para hacer una solicitud HTTP al servidor.
+
             fetch('http://3.22.141.139:5557/verifyCode', {
                 method: 'POST',
                 headers: {
@@ -99,8 +98,10 @@
             })
             .then(response => {
                 if (response.ok) {
+                    // Inicio de sesión exitoso, establecer el indicador de sesión
+                    sessionStorage.setItem('loggedIn', 'true');
                     window.location.href = "map.html";
-                    alert('Código de verificación válido. Login exitoso!');
+                    alert('Código de verificación válido. ¡Inicio de sesión exitoso!');
                 } else {
                     alert('Código de verificación inválido. Inténtalo de nuevo.');
                 }
