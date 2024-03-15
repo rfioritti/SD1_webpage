@@ -235,11 +235,9 @@
 
     </style>
     <script>
-        // Verificar si el usuario está autenticado
-        if (!sessionStorage.getItem('loggedIn')) {
-            // Si no está autenticado, redirigir al inicio de sesión
-            window.location.href = 'login.html';
-        }
+    if (document.referrer.indexOf("login.html") === -1) {
+      window.location.href = "login.html";
+    }
     </script>
 </head>
 <body>
