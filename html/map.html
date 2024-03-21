@@ -310,6 +310,7 @@
         var markersDictionary = {};
         var markersArray = [];
         var deptArray = [];
+        var searchZone = {};
         var markersJSON;
 
         function sendMarkersDataRoute() {
@@ -508,6 +509,7 @@
 
                             var risk = jsonResponse.results[0];
                             deptArray = jsonResponse.results[1];
+                            searchZone = jsonResponse.results[2];
 
                             console.log(risk);
 
@@ -606,6 +608,7 @@
                         
                         //Agregar la lista de Deptos al diccionario antes pasar a JSON
                         areaMarker['deptos'] = deptArray;
+                        areaMarker['zona'] = searchZone;
 
                         // Convertir a JSON y enviar los datos de marcadores ordenados
                         markersJSON = JSON.stringify(areaMarker);
@@ -621,6 +624,7 @@
                     markersDictionary = {};
                     markersArray = [];
                     deptArray = [];
+                    searchZone = {};
 
 
                 } else {
