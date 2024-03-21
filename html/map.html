@@ -311,6 +311,7 @@
         var markersArray = [];
         var deptArray = [];
         var searchZone = {};
+        var alpha = {};
         var markersJSON;
 
         function sendMarkersDataRoute() {
@@ -510,6 +511,7 @@
                             var risk = jsonResponse.results[0];
                             deptArray = jsonResponse.results[1];
                             searchZone = jsonResponse.results[2];
+                            alpha = jsonResponse.results[3];
 
                             console.log(risk);
 
@@ -606,9 +608,10 @@
                         var areaMarker = {};
                         areaMarker['mark'] = dato;
                         
-                        //Agregar la lista de Deptos al diccionario antes pasar a JSON
+                        //Agregar la lista de Deptos, zona y alfa al diccionario antes pasar a JSON
                         areaMarker['deptos'] = deptArray;
                         areaMarker['zona'] = searchZone;
+                        areaMarker['alfa'] = alpha;
 
                         // Convertir a JSON y enviar los datos de marcadores ordenados
                         markersJSON = JSON.stringify(areaMarker);
@@ -625,6 +628,7 @@
                     markersArray = [];
                     deptArray = [];
                     searchZone = {};
+                    alpha = {};
 
 
                 } else {
