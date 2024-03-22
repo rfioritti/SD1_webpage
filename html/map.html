@@ -506,7 +506,7 @@
                                 responseMessageElement.className = 'danger';
                             }
 
-                            responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del área es: ' + jsonResponse.results[0];
+                            responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del área es: ' + Math.round(jsonResponse.results[0] * 100) / 100;
 
                             var risk = jsonResponse.results[0];
                             deptArray = jsonResponse.results[1];
