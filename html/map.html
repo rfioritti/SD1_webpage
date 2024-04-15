@@ -352,7 +352,13 @@
                             responseMessageElement.className = 'danger';
                         }
 
-                        responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del recorrido es: ' + Math.round(jsonResponse.results[0] * 100) / 100;
+                        var finalRisk;
+                        if (Math.round(jsonResponse.results[0] * 100) / 100 > 10) {
+                            finalRisk = 10;
+                        } else {
+                            finalRisk = Math.round(jsonResponse.results[0] * 100) / 100;
+                        }
+                        responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del recorrido es: ' + finalRisk;
 
                         var risk = jsonResponse.results[0];
                         var accidentMarks = jsonResponse.results[1];
@@ -507,7 +513,13 @@
                                 responseMessageElement.className = 'danger';
                             }
 
-                            responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del área es: ' + Math.round(jsonResponse.results[0] * 100) / 100;
+                            var finalRisk;
+                            if (Math.round(jsonResponse.results[0] * 100) / 100 > 10) {
+                                finalRisk = 10;
+                            } else {
+                                finalRisk = Math.round(jsonResponse.results[0] * 100) / 100;
+                            }
+                            responseMessageElement.innerHTML = 'Respuesta del servidor: ' + jsonResponse.message + '. El riesgo del área es: ' + finalRisk;
 
                             var risk = jsonResponse.results[0];
                             deptArray = jsonResponse.results[1];
